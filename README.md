@@ -14,3 +14,16 @@
 1. 克隆仓库：`git clone https://github.com/CHACHA1981/My-TA-Journey.git`
 2. 进入工具目录：`cd TechArt-Tools`
 3. 运行脚本：`python texture_checker.py`
+   DAY2......
+## auto_dissolve_material.py
+**功能**：自动化生成溶解材质并应用到Unity模型
+**使用方法**：
+1. 运行脚本：`python auto_dissolve_material.py`
+2. 输入Unity项目路径
+3. 在Unity中点击菜单：[TA Tools] -> [Auto Apply Dissolve Material]
+
+**效果**：
+- 自动为`Assets/Models/`下的所有模型创建溶解材质
+- 材质名格式：`[模型名]_Dissolve.mat`
+- 使用自定义`Dissolve_Effect.shadergraph`Shader
+- 自动将材质应用到模型的Mesh Renderer
