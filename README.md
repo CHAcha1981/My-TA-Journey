@@ -14,7 +14,7 @@
 1. 克隆仓库：`git clone https://github.com/CHACHA1981/My-TA-Journey.git`
 2. 进入工具目录：`cd TechArt-Tools`
 3. 运行脚本：`python texture_checker.py`
-   DAY2......
+   
 ## auto_dissolve_material.py
 **功能**：自动化生成溶解材质并应用到Unity模型
 **使用方法**：
