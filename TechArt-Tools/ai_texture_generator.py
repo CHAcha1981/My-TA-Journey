@@ -7,12 +7,14 @@ import sys
 import time
 from base64 import b64decode
 from binascii import Error as BinasciiError
+from urllib.parse import urlparse
 
 import requests
 from PIL import Image
 
 # 配置
-STABLE_DIFFUSION_API = 'http://localhost:7860/sdapi/v1/txt2img'
+DEFAULT_SD_API = "http://localhost:7860/sdapi/v1/txt2img"
+STABLE_DIFFUSION_API = os.getenv("STABLE_DIFFUSION_API", DEFAULT_SD_API).strip()
 UNITY_TEXTURE_FOLDER = r'E:\unityproject\My project (6)\Assets\Ai_Textures'#unity贴图路径
 OUTPUT_SIZE = 1024  # 最终图片的分辨率，2的幂
 
@@ -27,6 +29,26 @@ def ensure_folder(path):
         except OSError as e:
             print(f"创建目录失败: {path}，错误: {e}")
             sys.exit(1)
+
+
+def check_sd_api_available(api_url):
+    """Check SD WebUI endpoint before starting batch generation."""
+    parsed = urlparse(api_url)
+    if not parsed.scheme or not parsed.netloc:
+        print(f"STABLE_DIFFUSION_API 配置无效: {api_url}")
+        return False
+    health_url = f"{parsed.scheme}://{parsed.netloc}/sdapi/v1/options"
+    try:
+        response = requests.get(health_url, timeout=8)
+        response.raise_for_status()
+        return True
+    except requests.RequestException as e:
+        print("Stable Diffusion API 不可用。")
+        print(f"- 当前地址: {api_url}")
+        print("- 请确认 A1111/Forge 已启动并开启 API (--api)。")
+        print("- 也可以通过环境变量 STABLE_DIFFUSION_API 指定地址。")
+        print(f"- 连通性检查失败: {e}")
+        return False
 
 
 def post_sd_request(prompt, seed=None, size=OUTPUT_SIZE, negative_prompt=None):
@@ -83,6 +105,9 @@ def import_to_unity(asset_path):
 def batch_generate(prompts_dict, out_folder=UNITY_TEXTURE_FOLDER, size=OUTPUT_SIZE):
     """Generate all prompts, save textures, and write config mapping."""
     ensure_folder(out_folder)
+    if not check_sd_api_available(STABLE_DIFFUSION_API):
+        print("终止批量生成。")
+        return
     result_config = {}
 
     total = len(prompts_dict)
